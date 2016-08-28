@@ -1,4 +1,4 @@
-var apiURL = 'https://api.github.com/repos/vuejs/vue/commits?per_page=3&sha='
+var apiURL = 'https://api.github.com/repos/vuejs/vue/commits?per_page=2&sha='
 var isPhantom = navigator.userAgent.indexOf('PhantomJS') > -1
 
 /**
@@ -6,8 +6,8 @@ var isPhantom = navigator.userAgent.indexOf('PhantomJS') > -1
  */
 
 var mocks = {
-  master: [{sha:'111111111111', commit: {message:'one', author:{name:'Evan',date:'2014-10-15T13:52:58Z'}}},{sha:'111111111111', commit: {message:'hi', author:{name:'Evan',date:'2014-10-15T13:52:58Z'}}},{sha:'111111111111', commit: {message:'hi', author:{name:'Evan',date:'2014-10-15T13:52:58Z'}}}],
-  dev: [{sha:'222222222222', commit: {message:'two', author:{name:'Evan',date:'2014-10-15T13:52:58Z'}}},{sha:'111111111111', commit: {message:'hi', author:{name:'Evan',date:'2014-10-15T13:52:58Z'}}},{sha:'111111111111', commit: {message:'hi', author:{name:'Evan',date:'2014-10-15T13:52:58Z'}}}]
+  master: [{sha:'111111111111', commit: {message:'one', author:{name:'Evan',date:'2014-10-15T13:52:58Z'}}},{sha:'111111111111', commit: {message:'hi', author:{name:'Evan',date:'2014-10-15T13:52:58Z'}}}],
+  dev: [{sha:'222222222222', commit: {message:'two', author:{name:'Evan',date:'2014-10-15T13:52:58Z'}}},{sha:'111111111111', commit: {message:'hi', author:{name:'Evan',date:'2014-10-15T13:52:58Z'}}}]
 }
 
 function mockData () {
@@ -25,11 +25,15 @@ var demo = new Vue({
   data: {
     branches: ['master', 'dev'],
     currentBranch: 'master',
-    commits: null
+    commits: null,
+    mytest: {
+      foo: { bar: "Test!" },
+      zin: [1,2,3]
+    }
   },
 
   created: function () {
-    this.fetchData()
+    this.fetchData();
   },
 
   watch: {
@@ -45,22 +49,16 @@ var demo = new Vue({
       return v.replace(/T|Z/g, ' ')
     }
   },
-
   methods: {
+    doTest: function (e) {
+        this.mytest.foo.bar = "Test | Random:" + Math.random().toFixed(2);
+        this.commits[0].commit.author.name = "XXX:" + Math.random();
+    },
     fetchData: function () {
-      // CasperJS fails at cross-domain XHR even with
-      // --web-security=no, have to mock data here.
-      if (isPhantom) {
-        return mockData.call(this)
-      }
-      var xhr = new XMLHttpRequest()
       var self = this
-      xhr.open('GET', apiURL + self.currentBranch)
-      xhr.onload = function () {
-        self.commits = JSON.parse(xhr.responseText)
-        console.log(self.commits[0].html_url)
-      }
-      xhr.send()
+      setTimeout(function () {
+          self.commits = mocks[self.currentBranch];
+      });
     }
   }
 })

@@ -3,22 +3,39 @@
   <head>
     <title>Vue.js commits example</title>
     <style>
-      #demo {
-        font-family: 'Helvetica', Arial, sans-serif;
-      }
-      a {
-        text-decoration: none;
-        color: #f66;
-      }
-      li {
-        line-height: 1.5em;
-        margin-bottom: 20px;
-      }
-      .author, .date {
-        font-weight: bold;
-      }
+      #demo { font-family: 'Helvetica', Arial, sans-serif; }
+      a { text-decoration: none; color: #f66; }
+      li { line-height: 1.5em; margin-bottom: 20px; }
+      .author, .date { font-weight: bold; }
     </style>
     <script src="../../dist/vue.js"></script>
+
+    <script type="x/template" id="test">
+      <div class="modal-mask" style="border:1px solid blue">
+          <p>Test Component</p>
+          <p> <span>User: </span>{{user}}</p>
+          <slot></slot>
+          <button @click="shallClick"> Change prop! </button>
+      </div>
+    </script>
+
+    <script>
+      // register modal component
+      Vue.component('test', {
+        template: '#test',
+        props: {
+          user: {
+            required: true,
+          }
+        },
+        methods:{ 
+          shallClick: function (e) {
+            this.user = "Zinzin?" + Math.random();
+          }
+        }
+      })
+    </script>
+
   </head>
   <body>
     <div id="demo">
@@ -36,10 +53,14 @@
         <li v-for="record in commits">
           <a :href="record.html_url" target="_blank" class="commit">{{record.sha.slice(0, 7)}}</a>
           - <span class="message">{{record.commit.message | truncate}}</span><br>
-          by <span class="author">{{record.commit.author.name}}</span>
+          <span class="test">[Exp: {{ record.commit.author.name + ":" + Math.random(); }}!]</span>
           at <span class="date">{{record.commit.author.date | formatDate}}</span>
+          <test :user="record.commit.author.name">
+            <p>Yes?</p>
+          </test>
         </li>
       </ul>
+      <button @click="doTest">{{mytest.foo.bar}}</button>
     </div>
     <script src="app.js"></script>
   </body>
